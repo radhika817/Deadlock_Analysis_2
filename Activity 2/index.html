@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deadlock Analysis Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="wrap">
+      <h1>Deadlock Analysis and Resource Allocation</h1>
+      <div class="tabs" role="tablist" aria-label="Dashboard views">
+        <button class="tab" role="tab" id="tab-avoidance" aria-controls="panel-avoidance" aria-selected="true">Avoidance</button>
+        <button class="tab" role="tab" id="tab-detection" aria-controls="panel-detection" aria-selected="false" tabindex="-1">Detection</button>
+        <button class="tab" role="tab" id="tab-recovery" aria-controls="panel-recovery" aria-selected="false" tabindex="-1">Recovery</button>
+        <button class="tab" role="tab" id="tab-prevention" aria-controls="panel-prevention" aria-selected="false" tabindex="-1">Prevention</button>
+        <button class="tab" role="tab" id="tab-tests" aria-controls="panel-tests" aria-selected="false" tabindex="-1">Test Cases</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- Avoidance -->
+    <section class="panel" id="panel-avoidance" role="tabpanel" aria-labelledby="tab-avoidance">
+      <header>
+        <h2>Deadlock Avoidance: Banker's Algorithm</h2>
+        <p class="lead">Avoidance grants a request only if the system stays in a safe state afterwards. It looks ahead; it does not look for deadlocks that already exist.</p>
+      </header>
+      <div class="callout"><strong>Unsafe is not deadlocked.</strong> An unsafe state only means that no order is guaranteed to let every process finish. Processes may still finish if others release resources early. A deadlock means processes are already blocked for good.</div>
+
+      <div class="split">
+      <div class="col">
+      <div class="card">
+        <h3>Configuration</h3>
+        <div class="toolbar">
+          <div class="field"><label for="avoid-preset">Example</label><select id="avoid-preset"></select></div>
+          <div class="field"><label for="avoid-n">Processes</label><input type="text" inputmode="numeric" class="narrow" id="avoid-n" value="5"></div>
+          <div class="field"><label for="avoid-m">Resource types</label><input type="text" inputmode="numeric" class="narrow" id="avoid-m" value="3"></div>
+          <button class="btn secondary" id="avoid-apply" type="button">Apply size</button>
+          <button class="btn secondary" id="avoid-reset" type="button">Reset example</button>
+        </div>
+        <div class="matrices" id="avoid-matrices"></div>
+        <div class="toolbar" style="margin:1rem 0 0">
+          <button class="btn" id="avoid-run" type="button">Run safety check</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Resource request</h3>
+        <form class="toolbar" id="avoid-form" novalidate>
+          <div class="field"><label for="req-pid">Process</label><input type="text" class="narrow" id="req-pid" value="P1" autocomplete="off"></div>
+          <div class="field"><label for="req-vec">Request (one value per resource, e.g. 1 0 2)</label><input type="text" class="wide" id="req-vec" value="1 0 2" autocomplete="off"></div>
+          <button class="btn" type="submit">Submit request</button>
+        </form>
+        <div class="toolbar" id="req-examples" role="group" aria-label="Example requests" style="margin-bottom:0"></div>
+      </div>
+      </div>
+      <div class="col">
+        <div id="avoid-safety" role="status" aria-live="polite"></div>
+        <div id="avoid-request" role="status" aria-live="polite" style="margin-top:1.1rem"></div>
+      </div>
+      </div>
+    </section>
+
+    <!-- Detection -->
+    <section class="panel" id="panel-detection" role="tabpanel" aria-labelledby="tab-detection" hidden>
+      <header>
+        <h2>Deadlock Detection</h2>
+        <p class="lead">Detection inspects the current allocation and requests and reports which processes can never proceed. Unlike the Banker's algorithm, it takes no part in granting requests.</p>
+      </header>
+      <div class="callout"><strong>Cycle versus deadlock.</strong> With single-instance resources, a cycle in the resource-allocation graph is a deadlock. With multiple instances a cycle is only a potential circular wait, so the matrix detection algorithm decides.</div>
+
+      <div class="split">
+      <div class="col sticky">
+      <div class="card">
+        <h3>Scenario</h3>
+        <div class="toolbar">
+          <div class="field"><label for="det-preset">Example</label><select id="det-preset"></select></div>
+          <div class="field"><label for="det-n">Processes</label><input type="text" inputmode="numeric" class="narrow" id="det-n" value="4"></div>
+          <div class="field"><label for="det-m">Resource types</label><input type="text" inputmode="numeric" class="narrow" id="det-m" value="4"></div>
+          <button class="btn secondary" id="det-apply" type="button">Apply size</button>
+        </div>
+        <div class="matrices" id="det-matrices"></div>
+        <div class="toolbar" style="margin:1rem 0 0">
+          <button class="btn" id="det-run" type="button">Run detection</button>
+        </div>
+      </div>
+      </div>
+      <div class="col"><div id="det-result" role="status" aria-live="polite"></div></div>
+      </div>
+    </section>
+
+    <!-- Recovery -->
+    <section class="panel" id="panel-recovery" role="tabpanel" aria-labelledby="tab-recovery" hidden>
+      <header>
+        <h2>Deadlock Recovery</h2>
+        <p class="lead">Recovery breaks a deadlock that already exists. Here one deadlocked process is terminated, its resources are released, and detection runs again on the Detection scenario.</p>
+      </header>
+      <div id="recovery-content" class="grid-auto" role="status" aria-live="polite"></div>
+    </section>
+
+    <!-- Prevention -->
+    <section class="panel" id="panel-prevention" role="tabpanel" aria-labelledby="tab-prevention" hidden>
+      <header>
+        <h2>Deadlock Prevention</h2>
+        <p class="lead">Prevention changes the allocation policy so that at least one of the four necessary conditions can never hold. Each process below acquires single-instance resources in the order shown.</p>
+      </header>
+      <div class="split">
+      <div class="col sticky">
+      <div class="card">
+        <h3>Processes</h3>
+        <div class="table-scroll"><table class="data" id="prev-procs"></table></div>
+        <div class="field" style="margin-top:1rem">
+          <span class="label" id="prev-policy-label">Policy</span>
+          <div class="radios" role="radiogroup" aria-labelledby="prev-policy-label">
+            <label><input type="radio" name="policy" value="none"> No policy</label>
+            <label><input type="radio" name="policy" value="ordering" checked> Resource ordering (prevents circular wait)</label>
+            <label><input type="radio" name="policy" value="allornothing"> All-or-nothing (prevents hold and wait)</label>
+          </div>
+        </div>
+      </div>
+      </div>
+      <div class="col"><div id="prev-result" role="status" aria-live="polite"></div></div>
+      </div>
+    </section>
+
+    <!-- Test cases -->
+    <section class="panel" id="panel-tests" role="tabpanel" aria-labelledby="tab-tests" hidden>
+      <header>
+        <h2>Test Cases</h2>
+        <p class="lead">Each result below is produced by running the same algorithms used in the other views.</p>
+      </header>
+      <div class="toolbar"><button class="btn" id="tests-run" type="button">Run all test cases</button></div>
+      <div id="tests-result" role="status" aria-live="polite"></div>
+    </section>
+
+  </main>
+
+  <script src="js/engine.js"></script>
+  <script src="js/presets.js"></script>
+  <script src="js/cases.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
