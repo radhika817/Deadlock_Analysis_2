@@ -51,7 +51,12 @@ An interactive simulator and visualization suite for operating system deadlock h
 
 ## 🛠️ Getting Started
 
-### 1. Run the Dashboard in Browser
+### 1. Access the Live Dashboard
+
+Open the deployed web app directly in any browser:
+👉 **[https://deadlock-analysis-2.vercel.app/](https://deadlock-analysis-2.vercel.app/)**
+
+### 2. Run the Dashboard Locally
 
 You can run the web dashboard directly by starting any local HTTP server:
 
@@ -65,7 +70,7 @@ npx serve "Activity 2"
 
 Then open [http://localhost:8000](http://localhost:8000) in your web browser.
 
-### 2. Run Automated Tests
+### 3. Run Automated Tests
 
 To execute the 15 automated test cases verifying safety checks, requests, detection, and recovery:
 
