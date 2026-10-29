@@ -1,6 +1,10 @@
 # Deadlock Analysis and Resource Allocation Dashboard
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-black?style=for-the-badge&logo=vercel)](https://deadlock-analysis-2.vercel.app/)
+
 An interactive simulator and visualization suite for operating system deadlock handling algorithms, including **Deadlock Avoidance** (Banker's Algorithm), **Deadlock Detection** (Resource Allocation Graph & Multiple-Instance Vector Detection), **Deadlock Recovery** (Process Termination & Resource Preemption), and **Deadlock Prevention** (Hierarchical Resource Ordering & All-or-Nothing Allocation).
+
+🌐 **Live Deployment**: [https://deadlock-analysis-2.vercel.app/](https://deadlock-analysis-2.vercel.app/)
 
 ---
 
