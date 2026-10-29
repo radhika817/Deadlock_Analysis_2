@@ -275,3 +275,21 @@ tr.selected td { background: var(--subtle); }
   .grid-auto { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) { .wrap { padding: 0 1rem; } }
+
+/* Footer */
+.app-footer {
+  background: #181818;
+  border-top: 1px solid var(--border);
+  padding: 1.25rem 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+}
+.footer-content p { margin: 0; }
+.footer-contributors strong { color: var(--text); }
